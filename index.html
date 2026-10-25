@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pakar Diagnosa Kerusakan Tanah - Certainty Factor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; padding: 0; margin: 0; }
+            .print-border { border: 1px solid #000 !important; }
+        }
+        .option-card input:checked + div {
+            border-color: #059669;
+            background-color: #ecfdf5;
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15);
+        }
+        .option-card input:checked + div .radio-circle {
+            border-color: #059669;
+            background-color: #059669;
+        }
+        .option-card input:checked + div .radio-circle::after {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- NAVBAR / HEADER -->
+    <header class="bg-emerald-800 text-white shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3">
+                <i data-lucide="sprout" class="w-7 h-7 text-emerald-300"></i>
+                <div>
+                    <h1 class="text-lg font-bold">Sistem Pakar Kerusakan Tanah Sawit</h1>
+                    <p class="text-xs text-emerald-200">Metode Certainty Factor (CF) | PT. Tanah Hitam Dwi Sawit Sumatera</p>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-1 bg-emerald-900/60 p-1 rounded-lg border border-emerald-700/50 text-xs">
+                <button onclick="switchTab('pengamat')" id="nav-pengamat" class="px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Data Pengamat
+                </button>
+                <button onclick="switchTab('diagnosa')" id="nav-diagnosa" class="px-3 py-1.5 rounded-md font-semibold bg-emerald-600 text-white shadow-sm transition-all flex items-center gap-1.5">
+                    <i data-lucide="activity" class="w-3.5 h-3.5"></i> Diagnosa
+                </button>
+                <button onclick="switchTab('master')" id="nav-master" class="px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5">
+                    <i data-lucide="database" class="w-3.5 h-3.5"></i> Data Master
+                </button>
+                <button onclick="switchTab('laporan')" id="nav-laporan" class="px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Laporan Jurnal
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- TAB 0: DATA PENGAMAT -->
+        <div id="tab-pengamat" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-2xl mx-auto space-y-4">
+                <div class="border-b border-slate-200 pb-3 flex items-center gap-2">
+                    <i data-lucide="user-cog" class="w-5 h-5 text-emerald-600"></i>
+                    <h2 class="text-base font-bold text-slate-800">Form Data Pengamat (Pakar / Pemeriksa Lahan)</h2>
+                </div>
+                <p class="text-xs text-slate-500">Isi data pengamat sesuai dengan Form Gambar 5.1 pada Jurnal sebelum melakukan proses diagnosa.</p>
+                <form id="pengamatForm" onsubmit="savePengamat(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ID Pengamat</label>
+                        <input type="text" id="p_id" value="P001" required class="w-full p-2 border rounded focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nama Pengamat</label>
+                        <input type="text" id="p_nama" value="Astra Kusuma" required class="w-full p-2 border rounded focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Alamat / Perkebunan</label>
+                        <input type="text" id="p_alamat" value="Kebun Dwi Sawit, Blok C" required class="w-full p-2 border rounded focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">No. Telepon</label>
+                        <input type="text" id="p_telepon" value="085777022223" required class="w-full p-2 border rounded focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm transition-colors">
+                        Simpan Data Pengamat
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 1: DIAGNOSA INTERAKTIF -->
+        <div id="tab-diagnosa" class="space-y-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print space-y-1">
+                <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-5 h-5 text-emerald-600"></i>
+                    Dua Belas Gejala Yang Ditanyakan
+                </h2>
+                <p class="text-xs text-slate-600">
+                    Pilih salah satu tingkat keyakinan untuk setiap gejala. Pilihan <strong>"Belum Tahu / Tidak Dipilih"</strong> berarti pertanyaan belum dijawab dan tidak ikut dihitung.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 space-y-6">
+                    <form id="cfForm">
+                        <div id="gejalaContainer" class="space-y-6"></div>
+
+                        <div class="mt-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-3 justify-between items-center no-print">
+                            <button type="button" onclick="resetForm()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-2">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Pilihan
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-md transition-colors flex items-center gap-2">
+                                <i data-lucide="calculator" class="w-4 h-4"></i> Proses Diagnosa CF
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- SKENARIO UJI OTOMATIS -->
+                    <div class="bg-amber-50 rounded-xl p-4 border border-amber-200 space-y-3 no-print">
+                        <h3 class="font-bold text-amber-900 text-xs flex items-center gap-2">
+                            <i data-lucide="flask-conical" class="w-4 h-4 text-amber-600"></i>
+                            Pengujian Otomatis 5 Skenario Tugas
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <button type="button" onclick="runScenario(1)" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs text-left font-medium shadow-sm transition-all">
+                                1. Acuan Jurnal
+                            </button>
+                            <button type="button" onclick="runScenario(2)" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs text-left font-medium shadow-sm transition-all">
+                                2. Variasi Input
+                            </button>
+                            <button type="button" onclick="runScenario(3)" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs text-left font-medium shadow-sm transition-all">
+                                3. Gejala Kosong / 0
+                            </button>
+                            <button type="button" onclick="runScenario(4)" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs text-left font-medium shadow-sm transition-all">
+                                4. Input Tidak Valid
+                            </button>
+                            <button type="button" onclick="runScenario(5)" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs text-left font-medium shadow-sm transition-all">
+                                5. Kasus Batas / Seri
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden sticky top-20">
+                        <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                            <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-600"></i>
+                                Hasil Konsultasi & Diagnosa
+                            </h2>
+                        </div>
+                        <div id="hasilDiagnosaContainer" class="p-5 text-center text-slate-500 py-12">
+                            <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                            <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Diagnosa CF</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
+                        <div class="bg-slate-100 px-4 py-3 border-b border-slate-200">
+                            <h3 class="font-bold text-slate-800 text-xs flex items-center gap-2">
+                                <i data-lucide="binary" class="w-4 h-4 text-emerald-600"></i>
+                                Detail Iterasi Matematis (CF Combine)
+                            </h3>
+                        </div>
+                        <div id="detailPerhitunganContainer" class="p-4 max-h-[350px] overflow-y-auto text-xs space-y-4">
+                            <p class="text-slate-400 italic text-center py-6">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DATA MASTER -->
+        <div id="tab-master" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5 text-emerald-600"></i>
+                    Basis Pengetahuan Pakar & Excel Template
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left border-collapse border border-slate-200">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700">
+                                <th class="p-2 border">Kode Kerusakan</th>
+                                <th class="p-2 border">Kode Gejala</th>
+                                <th class="p-2 border">Nama Gejala</th>
+                                <th class="p-2 border text-center">MB</th>
+                                <th class="p-2 border text-center">MD</th>
+                                <th class="p-2 border text-center">CF Pakar (Excel Match)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="masterTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: LAPORAN DOKUMEN RESMI -->
+        <div id="tab-laporan" class="hidden space-y-6">
+            <div class="no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200">
+                <div class="text-xs text-slate-600">
+                    <p class="font-bold text-slate-800">Tampilan Laporan Resmi Jurnal (Gambar 5.3)</p>
+                    <p>Format laporan di bawah siap dicetak atau disimpan ke PDF.</p>
+                </div>
+                <button onclick="window.print()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan (Print / PDF)
+                </button>
+            </div>
+
+            <div id="reportPaper" class="bg-white p-8 rounded-xl border border-slate-300 shadow-md max-w-4xl mx-auto text-slate-900 space-y-6 font-serif">
+                <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                    <h1 class="text-lg font-bold tracking-wider uppercase">LAPORAN DATA HASIL DETEKSI</h1>
+                    <p class="text-xs font-sans tracking-wide">Perkebunan Sawit PT. Tanah Hitam Dwi Sawit Sumatera</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left border-collapse border border-slate-900">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-900 text-center font-bold">
+                                <th class="p-3 border border-slate-900 w-1/6">Tanggal</th>
+                                <th class="p-3 border border-slate-900 w-1/6">Kode Diagnosa</th>
+                                <th class="p-3 border border-slate-900 w-1/6">Nama Pengamat</th>
+                                <th class="p-3 border border-slate-900 w-1/4">Kerusakan</th>
+                                <th class="p-3 border border-slate-900 w-1/3">Solusi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jurnalReportTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="pt-12 flex justify-end text-xs font-sans">
+                    <div class="text-center w-48 space-y-12">
+                        <div>
+                            <p>Medan, <span id="currentDateReport">24/10/2026</span></p>
+                            <p class="font-bold">Diketahui,</p>
+                        </div>
+                        <p id="signatureName" class="font-bold underline uppercase">( Astra Kusuma )</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentPengamat = { id: "P001", nama: "Astra Kusuma", alamat: "Kebun Dwi Sawit, Blok C", telepon: "085777022223" };
+
+        const gejalaList = [
+            { code: "G01", name: "Tanah memiliki Skala Ph 0-5", desc: "Tingkat keasaman tanah sangat tinggi." },
+            { code: "G02", name: "Larutan tanah masam (test indicator Ph)", desc: "Hasil pengujian indikator pH menunjukkan sifat masam." },
+            { code: "G03", name: "Tanah bersifat korosif (test inidicator Ph)", desc: "Kandungan kimia tanah memicu reaksi korosif." },
+            { code: "G04", name: "Larutan tanah dapat menghantarkan listrik", desc: "Daya hantar listrik larutan tanah cukup tinggi." },
+            { code: "G05", name: "Tanah yang gersang", desc: "Kondisi fisik tanah kering dan kekurangan kadar air." },
+            { code: "G06", name: "Tanah yang tandus", desc: "Tanah tidak subur dan tidak produktif untuk tanaman." },
+            { code: "G07", name: "Tanah keras", desc: "Tekstur tanah memadat sehingga akar sulit menembus." },
+            { code: "G08", name: "Daun cenderung tidak hijau pekat", desc: "Warna daun kelapa sawit tampak menguning atau pucat." },
+            { code: "G09", name: "Tanah terlihat pucat", desc: "Warna tanah pudar menandakan krisis unsur hara/humus." },
+            { code: "G10", name: "Hasil buah sawit yang tidak maksimal", desc: "Produktivitas Tandan Buah Segar (TBS) menurun drastis." },
+            { code: "G11", name: "Sawit menjadi bantet", desc: "Pertumbuhan fisik pohon kerdil atau terhambat." },
+            { code: "G12", name: "Tanah menjadi lapuk tidak mampu menopang pohon", desc: "Daya dukung mekanis tanah melemah sehingga pohon mudah tumbang." }
+        ];
+
+        // Disesuaikan dengan perhitungan pada Excel Template
+        const kerusakanList = [
+            {
+                code: "P01",
+                name: "Tingkat keasaman/kebasaan tanah (pH) tidak netral",
+                solution: "Jika pH < 6.5 (masam), naikkan pH menggunakan bahan basa seperti pupuk kapur pertanian (dolomit). Jika pH > 7.5 (basa), berikan bahan organik kompos/kandang.",
+                rules: [
+                    { g: "G01", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G02", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G03", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G04", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G05", cfPakar: 0.0, mb: 0.4, md: 0.4 },
+                    { g: "G07", cfPakar: -0.6, mb: 0.2, md: 0.8 }
+                ]
+            },
+            {
+                code: "P02",
+                name: "Memiliki Biota Tanah yang sedikit",
+                solution: "Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.",
+                rules: [
+                    { g: "G05", cfPakar: 0.4, mb: 0.8, md: 0.4 },
+                    { g: "G07", cfPakar: -0.2, mb: 0.6, md: 0.8 },
+                    { g: "G08", cfPakar: 0.2, mb: 0.2, md: 0.0 },
+                    { g: "G09", cfPakar: 0.4, mb: 0.4, md: 0.0 },
+                    { g: "G10", cfPakar: -0.4, mb: 0.4, md: 0.8 },
+                    { g: "G12", cfPakar: 0.8, mb: 0.8, md: 0.0 }
+                ]
+            },
+            {
+                code: "P03",
+                name: "Memiliki lapisan Humus tipis",
+                solution: "Lakukan penambahan bahan organik secara teratur, tanam tanaman penutup tanah (cover crop), dan cegah erosi lahan.",
+                rules: [
+                    { g: "G06", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G07", cfPakar: -0.4, mb: 0.4, md: 0.8 },
+                    { g: "G08", cfPakar: 0.4, mb: 0.4, md: 0.0 },
+                    { g: "G09", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                    { g: "G10", cfPakar: -0.2, mb: 0.6, md: 0.8 },
+                    { g: "G11", cfPakar: 0.8, mb: 0.8, md: 0.0 }
+                ]
+            }
+        ];
+
+        const radioOptions = [
+            { label: "Tidak mengalami", sub: "Nilai 0,00", val: 0.0 },
+            { label: "Kurang yakin mengalami", sub: "Nilai 0,20", val: 0.2 },
+            { label: "Sedikit yakin mengalami", sub: "Nilai 0,40", val: 0.4 },
+            { label: "Cukup yakin mengalami", sub: "Nilai 0,60", val: 0.6 },
+            { label: "Yakin mengalami", sub: "Nilai 0,80", val: 0.8 },
+            { label: "Sangat yakin mengalami", sub: "Nilai 1,00", val: 1.0 },
+            { label: "Belum tahu", sub: "Tidak ikut perhitungan", val: -1.0 }
+        ];
+
+        function renderForm() {
+            const container = document.getElementById("gejalaContainer");
+            container.innerHTML = gejalaList.map(g => `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-start gap-2 border-b border-slate-100 pb-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">${g.code}</span>
+                                <h3 class="text-sm font-bold text-slate-800">${g.name}</h3>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">${g.desc}</p>
+                        </div>
+                        <span id="status-${g.code}" class="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded whitespace-nowrap">
+                            Belum dijawab
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${radioOptions.map(opt => `
+                            <label class="option-card cursor-pointer block">
+                                <input type="radio" name="radio-${g.code}" value="${opt.val}" onchange="updateAnswerStatus('${g.code}', ${opt.val}, '${opt.label}')" class="hidden" ${opt.val === -1.0 ? 'checked' : ''}>
+                                <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all flex items-center gap-2.5">
+                                    <div class="radio-circle w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center shrink-0"></div>
+                                    <div class="leading-tight">
+                                        <div class="text-xs font-semibold text-slate-700">${opt.label}</div>
+                                        <div class="text-[10px] text-slate-400">${opt.sub}</div>
+                                    </div>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            renderMasterTable();
+            renderDefaultReport();
+            lucide.createIcons();
+        }
+
+        function updateAnswerStatus(gCode, val, label) {
+            const el = document.getElementById(`status-${gCode}`);
+            if (val === -1.0) {
+                el.className = "text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded whitespace-nowrap";
+                el.innerText = "Belum dijawab";
+            } else {
+                el.className = "text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded whitespace-nowrap";
+                el.innerText = `Dijawab: ${label} (CF: ${val.toFixed(2)})`;
+            }
+        }
+
+        function resetForm() {
+            gejalaList.forEach(g => {
+                const defaultRadio = document.querySelector(`input[name="radio-${g.code}"][value="-1"]`);
+                if (defaultRadio) defaultRadio.checked = true;
+                updateAnswerStatus(g.code, -1.0, "");
+            });
+            document.getElementById("hasilDiagnosaContainer").innerHTML = `
+                <div class="text-center text-slate-500 py-12">
+                    <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                    <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Diagnosa CF</strong>.</p>
+                </div>
+            `;
+            document.getElementById("detailPerhitunganContainer").innerHTML = `
+                <p class="text-slate-400 italic text-center py-6">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
+            `;
+            renderDefaultReport();
+            lucide.createIcons();
+        }
+
+        function savePengamat(e) {
+            e.preventDefault();
+            currentPengamat.id = document.getElementById("p_id").value;
+            currentPengamat.nama = document.getElementById("p_nama").value;
+            currentPengamat.alamat = document.getElementById("p_alamat").value;
+            currentPengamat.telepon = document.getElementById("p_telepon").value;
+            document.getElementById("signatureName").innerText = `( ${currentPengamat.nama} )`;
+            alert("Data Pengamat Berhasil Disimpan!");
+            switchTab("diagnosa");
+        }
+
+        function calculateCF(userInputs) {
+            let results = [];
+            let allSteps = {};
+
+            kerusakanList.forEach(p => {
+                let currentCFCombine = 0;
+                let steps = [];
+                let iteration = 1;
+
+                p.rules.forEach(rule => {
+                    let cfUser = userInputs[rule.g] !== undefined ? userInputs[rule.g] : -1.0;
+                    if (cfUser >= 0) {
+                        let cfHE = rule.cfPakar * cfUser;
+                        if (cfHE !== 0) {
+                            let oldCF = currentCFCombine;
+                            if (iteration === 1) {
+                                currentCFCombine = cfHE;
+                            } else {
+                                if (oldCF > 0 && cfHE > 0) {
+                                    currentCFCombine = oldCF + cfHE * (1 - oldCF);
+                                } else if (oldCF < 0 && cfHE < 0) {
+                                    currentCFCombine = oldCF + cfHE * (1 + oldCF);
+                                } else {
+                                    currentCFCombine = (oldCF + cfHE) / (1 - Math.min(Math.abs(oldCF), Math.abs(cfHE)));
+                                }
+                            }
+                            steps.push({
+                                iter: iteration,
+                                gejala: rule.g,
+                                cfPakar: rule.cfPakar,
+                                cfUser: cfUser,
+                                cfHE: cfHE,
+                                cfOld: oldCF,
+                                cfCombine: currentCFCombine
+                            });
+                            iteration++;
+                        }
+                    }
+                });
+
+                results.push({
+                    code: p.code,
+                    name: p.name,
+                    solution: p.solution,
+                    finalCF: currentCFCombine,
+                    percentage: (currentCFCombine * 100).toFixed(2)
+                });
+                allSteps[p.code] = steps;
+            });
+
+            results.sort((a, b) => b.finalCF - a.finalCF);
+            return { results, allSteps };
+        }
+
+        document.getElementById("cfForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            let userInputs = {};
+            let hasValidInput = false;
+            gejalaList.forEach(g => {
+                const checkedRadio = document.querySelector(`input[name="radio-${g.code}"]:checked`);
+                let val = checkedRadio ? parseFloat(checkedRadio.value) : -1.0;
+                userInputs[g.code] = val;
+                if (val >= 0) hasValidInput = true;
+            });
+            const { results, allSteps } = calculateCF(userInputs);
+            displayResults(results, allSteps, hasValidInput);
+        });
+
+        function displayResults(results, allSteps, hasValidInput) {
+            const resContainer = document.getElementById("hasilDiagnosaContainer");
+            const calcContainer = document.getElementById("detailPerhitunganContainer");
+
+            if (!hasValidInput) {
+                resContainer.innerHTML = `
+                    <div class="bg-amber-50 text-amber-800 p-3 rounded-lg border border-amber-200 text-xs text-left space-y-1">
+                        <p class="font-bold flex items-center gap-1"><i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i> Belum Ada Gejala Dijawab</p>
+                        <p>Silakan pilih minimal satu tingkat keyakinan gejala selain <em>"Belum tahu"</em>.</p>
+                    </div>
+                `;
+                calcContainer.innerHTML = `<p class="text-slate-400 italic text-center py-6">Tidak ada perhitungan (gejala belum dipilih).</p>`;
+                lucide.createIcons();
+                return;
+            }
+
+            const mainResult = results[0];
+            resContainer.innerHTML = `
+                <div class="space-y-4 text-left">
+                    <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5">
+                        <span class="text-[10px] font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 rounded">DIAGNOSA UTAMA</span>
+                        <h3 class="text-sm font-bold text-emerald-950">${mainResult.name} (${mainResult.code})</h3>
+                        <div class="flex items-baseline gap-2 pt-1">
+                            <span class="text-3xl font-extrabold text-emerald-700">${mainResult.percentage}%</span>
+                            <span class="text-[11px] text-slate-500">(CF: ${mainResult.finalCF.toFixed(4)})</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
+                        <p class="text-xs font-bold text-slate-800">Rekomendasi Solusi:</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">${mainResult.solution}</p>
+                    </div>
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        <p class="text-xs font-bold text-slate-700">Peringkat Diagnosa Lainnya:</p>
+                        ${results.slice(1).map(r => `
+                            <div class="flex justify-between items-center text-xs p-2 bg-slate-50 rounded border border-slate-200">
+                                <span class="font-medium text-slate-700">${r.code} - ${r.name}</span>
+                                <span class="font-mono font-bold text-slate-700">${r.percentage}%</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            calcContainer.innerHTML = Object.keys(allSteps).map(pCode => {
+                let steps = allSteps[pCode];
+                let pData = kerusakanList.find(x => x.code === pCode);
+                return `
+                    <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50 space-y-1.5">
+                        <p class="font-bold text-slate-700 border-b border-slate-200 pb-1">${pCode}: ${pData.name}</p>
+                        ${steps.length === 0 ? '<p class="text-slate-400 italic">Tidak ada gejala relevan yang dipilih.</p>' : `
+                            <div class="space-y-1">
+                                ${steps.map(s => `
+                                    <div class="bg-white p-2 rounded border border-slate-200 text-[11px] space-y-0.5">
+                                        <div class="flex justify-between font-mono text-emerald-700 font-semibold">
+                                            <span>Iterasi ${s.iter} (${s.gejala})</span>
+                                            <span>CF[H,E] = ${s.cfHE.toFixed(4)}</span>
+                                        </div>
+                                        <p class="text-slate-500">CF Pakar (${s.cfPakar}) × CF User (${s.cfUser}) = ${s.cfHE.toFixed(4)}</p>
+                                        <p class="text-slate-700 font-mono">CF Combine = <strong>${s.cfCombine.toFixed(4)}</strong></p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+
+            updateJurnalReportTable(results);
+            lucide.createIcons();
+        }
+
+        function updateJurnalReportTable(results) {
+            const tbody = document.getElementById("jurnalReportTableBody");
+            const now = new Date();
+            const timeStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+            document.getElementById("currentDateReport").innerText = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+
+            let html = "";
+            results.forEach((r, idx) => {
+                html += `
+                    <tr class="align-top border-b border-slate-900">
+                        <td class="p-2.5 border border-slate-900 font-sans text-center">${timeStr}</td>
+                        <td class="p-2.5 border border-slate-900 font-sans text-center font-bold">Diag-0${idx+1}</td>
+                        <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${currentPengamat.nama}</td>
+                        <td class="p-2.5 border border-slate-900 font-sans"><strong>${r.name}</strong> (${r.percentage}%)</td>
+                        <td class="p-2.5 border border-slate-900 font-sans text-justify leading-relaxed">${r.solution}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderDefaultReport() {
+            const tbody = document.getElementById("jurnalReportTableBody");
+            tbody.innerHTML = `
+                <tr class="align-top border-b border-slate-900">
+                    <td class="p-2.5 border border-slate-900 font-sans text-center">27/02/2026 12:20:00</td>
+                    <td class="p-2.5 border border-slate-900 font-sans text-center font-bold">Diag-01</td>
+                    <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${currentPengamat.nama}</td>
+                    <td class="p-2.5 border border-slate-900 font-sans"><strong>Memiliki Biota Tanah yang sedikit</strong> (76.00%)</td>
+                    <td class="p-2.5 border border-slate-900 font-sans text-justify leading-relaxed">Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.</td>
+                </tr>
+            `;
+        }
+
+        function runScenario(scenNum) {
+            resetForm();
+            if (scenNum === 1) {
+                setRadioValue("G05", 1.0, "Sangat yakin mengalami");
+                setRadioValue("G07", 1.0, "Sangat yakin mengalami");
+                setRadioValue("G10", 1.0, "Sangat yakin mengalami");
+            } else if (scenNum === 2) {
+                setRadioValue("G01", 0.8, "Yakin mengalami");
+                setRadioValue("G02", 0.6, "Cukup yakin mengalami");
+                setRadioValue("G05", 0.4, "Sedikit yakin mengalami");
+            } else if (scenNum === 3) {
+                gejalaList.forEach(g => setRadioValue(g.code, 0.0, "Tidak mengalami"));
+            } else if (scenNum === 5) {
+                setRadioValue("G01", 0.8, "Yakin mengalami");
+                setRadioValue("G06", 0.8, "Yakin mengalami");
+            }
+            document.getElementById("cfForm").dispatchEvent(new Event("submit"));
+        }
+
+        function setRadioValue(gCode, val, label) {
+            const radio = document.querySelector(`input[name="radio-${gCode}"][value="${val}"]`);
+            if (radio) {
+                radio.checked = true;
+                updateAnswerStatus(gCode, val, label);
+            }
+        }
+
+        function renderMasterTable() {
+            const tbody = document.getElementById("masterTableBody");
+            let html = "";
+            kerusakanList.forEach(p => {
+                p.rules.forEach(r => {
+                    let gName = gejalaList.find(x => x.code === r.g).name;
+                    html += `
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="p-2 border font-bold text-emerald-800">${p.code} - ${p.name}</td>
+                            <td class="p-2 border font-mono">${r.g}</td>
+                            <td class="p-2 border">${gName}</td>
+                            <td class="p-2 border text-center font-mono">${r.mb}</td>
+                            <td class="p-2 border text-center font-mono">${r.md}</td>
+                            <td class="p-2 border text-center font-mono font-bold text-emerald-700">${r.cfPakar}</td>
+                        </tr>
+                    `;
+                });
+            });
+            tbody.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            ["pengamat", "diagnosa", "master", "laporan"].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add("hidden");
+                const btn = document.getElementById(`nav-${t}`);
+                if (btn) btn.className = "px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) activeBtn.className = "px-3 py-1.5 rounded-md font-semibold bg-emerald-600 text-white shadow-sm transition-all flex items-center gap-1.5";
+        }
+
+        window.onload = function() {
+            renderForm();
+        };
+    </script>
+</body>
+</html>
