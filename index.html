@@ -43,7 +43,7 @@
                 <i data-lucide="sprout" class="w-7 h-7 text-emerald-300"></i>
                 <div>
                     <h1 class="text-lg font-bold">Sistem Pakar Kerusakan Tanah Sawit</h1>
-                    <p class="text-xs text-emerald-200">Metode Certainty Factor (CF) | PT. Tanah Hitam Dwi Sawit Sumatera</p>
+                    <p class="text-xs text-emerald-200">Knowledge Base & Inference Engine (Client-Side DB)</p>
                 </div>
             </div>
             
@@ -55,7 +55,7 @@
                     <i data-lucide="activity" class="w-3.5 h-3.5"></i> Diagnosa
                 </button>
                 <button onclick="switchTab('master')" id="nav-master" class="px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5">
-                    <i data-lucide="database" class="w-3.5 h-3.5"></i> Data Master
+                    <i data-lucide="database" class="w-3.5 h-3.5"></i> Knowledge Base (DB)
                 </button>
                 <button onclick="switchTab('laporan')" id="nav-laporan" class="px-3 py-1.5 rounded-md font-semibold text-emerald-200 hover:text-white hover:bg-emerald-800 transition-all flex items-center gap-1.5">
                     <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Laporan Jurnal
@@ -104,7 +104,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print space-y-1">
                 <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
                     <i data-lucide="help-circle" class="w-5 h-5 text-emerald-600"></i>
-                    Dua Belas Gejala Yang Ditanyakan
+                    Dua Belas Gejala Yang Ditanyakan (Working Memory)
                 </h2>
                 <p class="text-xs text-slate-600">
                     Pilih salah satu tingkat keyakinan untuk setiap gejala. Pilihan <strong>"Belum Tahu / Tidak Dipilih"</strong> berarti pertanyaan belum dijawab dan tidak ikut dihitung.
@@ -121,7 +121,7 @@
                                 <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Pilihan
                             </button>
                             <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-md transition-colors flex items-center gap-2">
-                                <i data-lucide="calculator" class="w-4 h-4"></i> Proses Diagnosa CF
+                                <i data-lucide="calculator" class="w-4 h-4"></i> Proses Inference Engine (CF)
                             </button>
                         </div>
                     </form>
@@ -162,7 +162,7 @@
                         </div>
                         <div id="hasilDiagnosaContainer" class="p-5 text-center text-slate-500 py-12">
                             <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-                            <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Diagnosa CF</strong>.</p>
+                            <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Inference Engine</strong>.</p>
                         </div>
                     </div>
 
@@ -181,13 +181,14 @@
             </div>
         </div>
 
-        <!-- TAB 2: DATA MASTER -->
+        <!-- TAB 2: KNOWLEDGE BASE (DATABASE SIMULATOR) -->
         <div id="tab-master" class="hidden space-y-6">
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                 <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                     <i data-lucide="database" class="w-5 h-5 text-emerald-600"></i>
-                    Basis Pengetahuan Pakar & Excel Template
+                    Knowledge Base & Relasi Tabel (Class Diagram 4.3)
                 </h2>
+                <p class="text-xs text-slate-500">Struktur basis pengetahuan disimpan dalam objek terstruktur (Client-Side Database) yang merefleksikan entitas Data Gejala, Data Kerusakan, dan Basis Pengetahuan.</p>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left border-collapse border border-slate-200">
                         <thead>
@@ -195,8 +196,8 @@
                                 <th class="p-2 border">Kode Kerusakan</th>
                                 <th class="p-2 border">Kode Gejala</th>
                                 <th class="p-2 border">Nama Gejala</th>
-                                <th class="p-2 border text-center">MB</th>
-                                <th class="p-2 border text-center">MD</th>
+                                <th class="p-2 border text-center">MB (Belief)</th>
+                                <th class="p-2 border text-center">MD (Disbelief)</th>
                                 <th class="p-2 border text-center">CF Pakar (Excel Match)</th>
                             </tr>
                         </thead>
@@ -253,65 +254,70 @@
     </main>
 
     <script>
-        let currentPengamat = { id: "P001", nama: "Astra Kusuma", alamat: "Kebun Dwi Sawit, Blok C", telepon: "085777022223" };
-
-        const gejalaList = [
-            { code: "G01", name: "Tanah memiliki Skala Ph 0-5", desc: "Tingkat keasaman tanah sangat tinggi." },
-            { code: "G02", name: "Larutan tanah masam (test indicator Ph)", desc: "Hasil pengujian indikator pH menunjukkan sifat masam." },
-            { code: "G03", name: "Tanah bersifat korosif (test inidicator Ph)", desc: "Kandungan kimia tanah memicu reaksi korosif." },
-            { code: "G04", name: "Larutan tanah dapat menghantarkan listrik", desc: "Daya hantar listrik larutan tanah cukup tinggi." },
-            { code: "G05", name: "Tanah yang gersang", desc: "Kondisi fisik tanah kering dan kekurangan kadar air." },
-            { code: "G06", name: "Tanah yang tandus", desc: "Tanah tidak subur dan tidak produktif untuk tanaman." },
-            { code: "G07", name: "Tanah keras", desc: "Tekstur tanah memadat sehingga akar sulit menembus." },
-            { code: "G08", name: "Daun cenderung tidak hijau pekat", desc: "Warna daun kelapa sawit tampak menguning atau pucat." },
-            { code: "G09", name: "Tanah terlihat pucat", desc: "Warna tanah pudar menandakan krisis unsur hara/humus." },
-            { code: "G10", name: "Hasil buah sawit yang tidak maksimal", desc: "Produktivitas Tandan Buah Segar (TBS) menurun drastis." },
-            { code: "G11", name: "Sawit menjadi bantet", desc: "Pertumbuhan fisik pohon kerdil atau terhambat." },
-            { code: "G12", name: "Tanah menjadi lapuk tidak mampu menopang pohon", desc: "Daya dukung mekanis tanah melemah sehingga pohon mudah tumbang." }
-        ];
-
-        // Disesuaikan dengan perhitungan pada Excel Template
-        const kerusakanList = [
-            {
-                code: "P01",
-                name: "Tingkat keasaman/kebasaan tanah (pH) tidak netral",
-                solution: "Jika pH < 6.5 (masam), naikkan pH menggunakan bahan basa seperti pupuk kapur pertanian (dolomit). Jika pH > 7.5 (basa), berikan bahan organik kompos/kandang.",
-                rules: [
-                    { g: "G01", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G02", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G03", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G04", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G05", cfPakar: 0.0, mb: 0.4, md: 0.4 },
-                    { g: "G07", cfPakar: -0.6, mb: 0.2, md: 0.8 }
-                ]
+        // === 1. KNOWLEDGE BASE & DATABASE STRCTURE (CLASS DIAGRAM 4.3) ===
+        const KnowledgeBase = {
+            pengamat: {
+                id: "P001",
+                nama: "Astra Kusuma",
+                alamat: "Kebun Dwi Sawit, Blok C",
+                telepon: "085777022223"
             },
-            {
-                code: "P02",
-                name: "Memiliki Biota Tanah yang sedikit",
-                solution: "Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.",
-                rules: [
-                    { g: "G05", cfPakar: 0.4, mb: 0.8, md: 0.4 },
-                    { g: "G07", cfPakar: -0.2, mb: 0.6, md: 0.8 },
-                    { g: "G08", cfPakar: 0.2, mb: 0.2, md: 0.0 },
-                    { g: "G09", cfPakar: 0.4, mb: 0.4, md: 0.0 },
-                    { g: "G10", cfPakar: -0.4, mb: 0.4, md: 0.8 },
-                    { g: "G12", cfPakar: 0.8, mb: 0.8, md: 0.0 }
-                ]
-            },
-            {
-                code: "P03",
-                name: "Memiliki lapisan Humus tipis",
-                solution: "Lakukan penambahan bahan organik secara teratur, tanam tanaman penutup tanah (cover crop), dan cegah erosi lahan.",
-                rules: [
-                    { g: "G06", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G07", cfPakar: -0.4, mb: 0.4, md: 0.8 },
-                    { g: "G08", cfPakar: 0.4, mb: 0.4, md: 0.0 },
-                    { g: "G09", cfPakar: 0.8, mb: 0.8, md: 0.0 },
-                    { g: "G10", cfPakar: -0.2, mb: 0.6, md: 0.8 },
-                    { g: "G11", cfPakar: 0.8, mb: 0.8, md: 0.0 }
-                ]
-            }
-        ];
+            gejala: [
+                { code: "G001", name: "Tanah memiliki Skala Ph 0-5", desc: "Tingkat keasaman tanah sangat tinggi." },
+                { code: "G002", name: "Larutan tanah terasa masam (test indicator Ph)", desc: "Hasil pengujian indikator pH menunjukkan sifat masam." },
+                { code: "G003", name: "Tanah bersifat korosif (test inidicator Ph)", desc: "Kandungan kimia tanah memicu reaksi korosif." },
+                { code: "G004", name: "Larutan tanah dapat menghantarkan listrik", desc: "Daya hantar listrik larutan tanah cukup tinggi." },
+                { code: "G005", name: "Tanah yang gersang", desc: "Kondisi fisik tanah kering dan kekurangan kadar air." },
+                { code: "G006", name: "Tanah yang tandus", desc: "Tanah tidak subur dan tidak produktif untuk tanaman." },
+                { code: "G007", name: "Tanah keras", desc: "Tekstur tanah memadat sehingga akar sulit menembus." },
+                { code: "G008", name: "Daun cenderung tidak hijau pekat", desc: "Warna daun kelapa sawit tampak menguning atau pucat." },
+                { code: "G009", name: "Tanah terlihat pucat", desc: "Warna tanah pudar menandakan krisis unsur hara/humus." },
+                { code: "G010", name: "Hasil buah sawit yang tidak maksimal", desc: "Produktivitas Tandan Buah Segar (TBS) menurun drastis." },
+                { code: "G011", name: "Sawit menjadi bantet", desc: "Pertumbuhan fisik pohon kerdil atau terhambat." },
+                { code: "G012", name: "Tanah menjadi lapuk tidak mampu menopang pohon", desc: "Daya dukung mekanis tanah melemah sehingga pohon mudah tumbang." }
+            ],
+            kerusakan: [
+                {
+                    code: "P01",
+                    name: "Tingkat keasaman/kebasaan tanah (pH) tidak netral",
+                    solution: "Jika pH < 6.5 (masam), naikkan pH menggunakan bahan basa seperti pupuk kapur pertanian (dolomit). Jika pH > 7.5 (basa), berikan bahan organik kompos/kandang.",
+                    rules: [
+                        { g: "G001", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G002", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G003", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G004", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G005", cfPakar: 0.0, mb: 0.4, md: 0.4 },
+                        { g: "G007", cfPakar: -0.6, mb: 0.2, md: 0.8 }
+                    ]
+                },
+                {
+                    code: "P02",
+                    name: "Memiliki Biota Tanah yang sedikit",
+                    solution: "Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.",
+                    rules: [
+                        { g: "G005", cfPakar: 0.4, mb: 0.8, md: 0.4 },
+                        { g: "G007", cfPakar: -0.2, mb: 0.6, md: 0.8 },
+                        { g: "G008", cfPakar: 0.2, mb: 0.2, md: 0.0 },
+                        { g: "G009", cfPakar: 0.4, mb: 0.4, md: 0.0 },
+                        { g: "G010", cfPakar: -0.4, mb: 0.4, md: 0.8 },
+                        { g: "G012", cfPakar: 0.8, mb: 0.8, md: 0.0 }
+                    ]
+                },
+                {
+                    code: "P03",
+                    name: "Memiliki lapisan Humus tipis",
+                    solution: "Lakukan penambahan bahan organik secara teratur, tanam tanaman penutup tanah (cover crop), dan cegah erosi lahan.",
+                    rules: [
+                        { g: "G006", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G007", cfPakar: -0.4, mb: 0.4, md: 0.8 },
+                        { g: "G008", cfPakar: 0.4, mb: 0.4, md: 0.0 },
+                        { g: "G009", cfPakar: 0.8, mb: 0.8, md: 0.0 },
+                        { g: "G010", cfPakar: -0.2, mb: 0.6, md: 0.8 },
+                        { g: "G011", cfPakar: 0.8, mb: 0.8, md: 0.0 }
+                    ]
+                }
+            ]
+        };
 
         const radioOptions = [
             { label: "Tidak mengalami", sub: "Nilai 0,00", val: 0.0 },
@@ -325,7 +331,7 @@
 
         function renderForm() {
             const container = document.getElementById("gejalaContainer");
-            container.innerHTML = gejalaList.map(g => `
+            container.innerHTML = KnowledgeBase.gejala.map(g => `
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
                     <div class="flex justify-between items-start gap-2 border-b border-slate-100 pb-2">
                         <div>
@@ -372,7 +378,7 @@
         }
 
         function resetForm() {
-            gejalaList.forEach(g => {
+            KnowledgeBase.gejala.forEach(g => {
                 const defaultRadio = document.querySelector(`input[name="radio-${g.code}"][value="-1"]`);
                 if (defaultRadio) defaultRadio.checked = true;
                 updateAnswerStatus(g.code, -1.0, "");
@@ -380,7 +386,7 @@
             document.getElementById("hasilDiagnosaContainer").innerHTML = `
                 <div class="text-center text-slate-500 py-12">
                     <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-                    <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Diagnosa CF</strong>.</p>
+                    <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Inference Engine</strong>.</p>
                 </div>
             `;
             document.getElementById("detailPerhitunganContainer").innerHTML = `
@@ -392,20 +398,21 @@
 
         function savePengamat(e) {
             e.preventDefault();
-            currentPengamat.id = document.getElementById("p_id").value;
-            currentPengamat.nama = document.getElementById("p_nama").value;
-            currentPengamat.alamat = document.getElementById("p_alamat").value;
-            currentPengamat.telepon = document.getElementById("p_telepon").value;
-            document.getElementById("signatureName").innerText = `( ${currentPengamat.nama} )`;
+            KnowledgeBase.pengamat.id = document.getElementById("p_id").value;
+            KnowledgeBase.pengamat.nama = document.getElementById("p_nama").value;
+            KnowledgeBase.pengamat.alamat = document.getElementById("p_alamat").value;
+            KnowledgeBase.pengamat.telepon = document.getElementById("p_telepon").value;
+            document.getElementById("signatureName").innerText = `( ${KnowledgeBase.pengamat.nama} )`;
             alert("Data Pengamat Berhasil Disimpan!");
             switchTab("diagnosa");
         }
 
+        // === 2. INFERENCE ENGINE (PROSES CERTAINTY FACTOR) ===
         function calculateCF(userInputs) {
             let results = [];
             let allSteps = {};
 
-            kerusakanList.forEach(p => {
+            KnowledgeBase.kerusakan.forEach(p => {
                 let currentCFCombine = 0;
                 let steps = [];
                 let iteration = 1;
@@ -459,7 +466,7 @@
             e.preventDefault();
             let userInputs = {};
             let hasValidInput = false;
-            gejalaList.forEach(g => {
+            KnowledgeBase.gejala.forEach(g => {
                 const checkedRadio = document.querySelector(`input[name="radio-${g.code}"]:checked`);
                 let val = checkedRadio ? parseFloat(checkedRadio.value) : -1.0;
                 userInputs[g.code] = val;
@@ -514,7 +521,7 @@
 
             calcContainer.innerHTML = Object.keys(allSteps).map(pCode => {
                 let steps = allSteps[pCode];
-                let pData = kerusakanList.find(x => x.code === pCode);
+                let pData = KnowledgeBase.kerusakan.find(x => x.code === pCode);
                 return `
                     <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50 space-y-1.5">
                         <p class="font-bold text-slate-700 border-b border-slate-200 pb-1">${pCode}: ${pData.name}</p>
@@ -552,7 +559,7 @@
                     <tr class="align-top border-b border-slate-900">
                         <td class="p-2.5 border border-slate-900 font-sans text-center">${timeStr}</td>
                         <td class="p-2.5 border border-slate-900 font-sans text-center font-bold">Diag-0${idx+1}</td>
-                        <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${currentPengamat.nama}</td>
+                        <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${KnowledgeBase.pengamat.nama}</td>
                         <td class="p-2.5 border border-slate-900 font-sans"><strong>${r.name}</strong> (${r.percentage}%)</td>
                         <td class="p-2.5 border border-slate-900 font-sans text-justify leading-relaxed">${r.solution}</td>
                     </tr>
@@ -567,7 +574,7 @@
                 <tr class="align-top border-b border-slate-900">
                     <td class="p-2.5 border border-slate-900 font-sans text-center">27/02/2026 12:20:00</td>
                     <td class="p-2.5 border border-slate-900 font-sans text-center font-bold">Diag-01</td>
-                    <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${currentPengamat.nama}</td>
+                    <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${KnowledgeBase.pengamat.nama}</td>
                     <td class="p-2.5 border border-slate-900 font-sans"><strong>Memiliki Biota Tanah yang sedikit</strong> (76.00%)</td>
                     <td class="p-2.5 border border-slate-900 font-sans text-justify leading-relaxed">Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.</td>
                 </tr>
@@ -577,18 +584,18 @@
         function runScenario(scenNum) {
             resetForm();
             if (scenNum === 1) {
-                setRadioValue("G05", 1.0, "Sangat yakin mengalami");
-                setRadioValue("G07", 1.0, "Sangat yakin mengalami");
-                setRadioValue("G10", 1.0, "Sangat yakin mengalami");
+                setRadioValue("G005", 1.0, "Sangat yakin mengalami");
+                setRadioValue("G007", 1.0, "Sangat yakin mengalami");
+                setRadioValue("G010", 1.0, "Sangat yakin mengalami");
             } else if (scenNum === 2) {
-                setRadioValue("G01", 0.8, "Yakin mengalami");
-                setRadioValue("G02", 0.6, "Cukup yakin mengalami");
-                setRadioValue("G05", 0.4, "Sedikit yakin mengalami");
+                setRadioValue("G001", 0.8, "Yakin mengalami");
+                setRadioValue("G002", 0.6, "Cukup yakin mengalami");
+                setRadioValue("G005", 0.4, "Sedikit yakin mengalami");
             } else if (scenNum === 3) {
-                gejalaList.forEach(g => setRadioValue(g.code, 0.0, "Tidak mengalami"));
+                KnowledgeBase.gejala.forEach(g => setRadioValue(g.code, 0.0, "Tidak mengalami"));
             } else if (scenNum === 5) {
-                setRadioValue("G01", 0.8, "Yakin mengalami");
-                setRadioValue("G06", 0.8, "Yakin mengalami");
+                setRadioValue("G001", 0.8, "Yakin mengalami");
+                setRadioValue("G006", 0.8, "Yakin mengalami");
             }
             document.getElementById("cfForm").dispatchEvent(new Event("submit"));
         }
@@ -604,9 +611,9 @@
         function renderMasterTable() {
             const tbody = document.getElementById("masterTableBody");
             let html = "";
-            kerusakanList.forEach(p => {
+            KnowledgeBase.kerusakan.forEach(p => {
                 p.rules.forEach(r => {
-                    let gName = gejalaList.find(x => x.code === r.g).name;
+                    let gName = KnowledgeBase.gejala.find(x => x.code === r.g).name;
                     html += `
                         <tr class="border-b hover:bg-slate-50">
                             <td class="p-2 border font-bold text-emerald-800">${p.code} - ${p.name}</td>
