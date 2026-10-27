@@ -32,6 +32,21 @@
             background-color: white;
             border-radius: 50%;
         }
+        /* Custom Scrollbar halus untuk sidebar kanan */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
@@ -111,7 +126,8 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- KOLOM KIRI (GEJALA & FORM) -->
                 <div class="lg:col-span-8 space-y-6">
                     <form id="cfForm">
                         <div id="gejalaContainer" class="space-y-6"></div>
@@ -152,29 +168,32 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden sticky top-20">
+                <!-- KOLOM KANAN (SIDEBAR PANELS - DIPERBAIKI STICKY & MAX-HEIGHT) -->
+                <div class="lg:col-span-4 sticky top-20 space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto custom-scroll pr-1">
+                    <!-- CARD HASIL DIAGNOSA -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                             <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                                 <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-600"></i>
                                 Hasil Konsultasi & Diagnosa
                             </h2>
                         </div>
-                        <div id="hasilDiagnosaContainer" class="p-5 text-center text-slate-500 py-12">
-                            <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                        <div id="hasilDiagnosaContainer" class="p-4 text-center text-slate-500 py-8">
+                            <i data-lucide="activity" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
                             <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Inference Engine</strong>.</p>
                         </div>
                     </div>
 
+                    <!-- CARD DETAIL ITERASI MATEMATIS -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden no-print">
                         <div class="bg-slate-100 px-4 py-3 border-b border-slate-200">
                             <h3 class="font-bold text-slate-800 text-xs flex items-center gap-2">
                                 <i data-lucide="binary" class="w-4 h-4 text-emerald-600"></i>
-                                Detail Iterasi Matematis (CF Combine)
+                                Detail Iterasi Matematis (CF Combine Custom)
                             </h3>
                         </div>
-                        <div id="detailPerhitunganContainer" class="p-4 max-h-[350px] overflow-y-auto text-xs space-y-4">
-                            <p class="text-slate-400 italic text-center py-6">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
+                        <div id="detailPerhitunganContainer" class="p-4 max-h-[280px] overflow-y-auto custom-scroll text-xs space-y-3">
+                            <p class="text-slate-400 italic text-center py-4">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
                         </div>
                     </div>
                 </div>
@@ -326,7 +345,7 @@
             { label: "Cukup yakin mengalami", sub: "Nilai 0,60", val: 0.6 },
             { label: "Yakin mengalami", sub: "Nilai 0,80", val: 0.8 },
             { label: "Sangat yakin mengalami", sub: "Nilai 1,00", val: 1.0 },
-            { label: "Belum tahu", sub: "Tidak ikut perhitungan", val: -1.0 }
+            { label: "Belum tahu", sub: "Tidak ikut perhitungan", val: 0.0 }
         ];
 
         function renderForm() {
@@ -381,16 +400,16 @@
             KnowledgeBase.gejala.forEach(g => {
                 const defaultRadio = document.querySelector(`input[name="radio-${g.code}"][value="-1"]`);
                 if (defaultRadio) defaultRadio.checked = true;
-                updateAnswerStatus(g.code, -1.0, "");
+                updateAnswerStatus(g.code, 0.0, "");
             });
             document.getElementById("hasilDiagnosaContainer").innerHTML = `
-                <div class="text-center text-slate-500 py-12">
-                    <i data-lucide="activity" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                <div class="text-center text-slate-500 py-8">
+                    <i data-lucide="activity" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
                     <p class="text-xs">Pilih tingkat keyakinan gejala di sebelah kiri lalu klik <strong>Proses Inference Engine</strong>.</p>
                 </div>
             `;
             document.getElementById("detailPerhitunganContainer").innerHTML = `
-                <p class="text-slate-400 italic text-center py-6">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
+                <p class="text-slate-400 italic text-center py-4">Detail kalkulasi bertahap akan tampil otomatis di sini.</p>
             `;
             renderDefaultReport();
             lucide.createIcons();
@@ -407,7 +426,7 @@
             switchTab("diagnosa");
         }
 
-        // === 2. INFERENCE ENGINE (PROSES CERTAINTY FACTOR) ===
+        // === 2. INFERENCE ENGINE (PROSES CERTAINTY FACTOR SESUAI RUMUS USER) ===
         function calculateCF(userInputs) {
             let results = [];
             let allSteps = {};
@@ -421,30 +440,31 @@
                     let cfUser = userInputs[rule.g] !== undefined ? userInputs[rule.g] : -1.0;
                     if (cfUser >= 0) {
                         let cfHE = rule.cfPakar * cfUser;
-                        if (cfHE !== 0) {
-                            let oldCF = currentCFCombine;
-                            if (iteration === 1) {
-                                currentCFCombine = cfHE;
+                        let oldCF = currentCFCombine;
+                        
+                        if (iteration === 1) {
+                            currentCFCombine = cfHE;
+                        } else {
+                            // FORMULA CUSTOM (SAMA DENGAN PERHITUNGAN MANUAL TEKS):
+                            if (oldCF >= 0 && cfHE >= 0) {
+                                currentCFCombine = (oldCF + cfHE) * (1 - oldCF);
+                            } else if (oldCF < 0 && cfHE < 0) {
+                                currentCFCombine = (oldCF + cfHE) * (1 + oldCF);
                             } else {
-                                if (oldCF > 0 && cfHE > 0) {
-                                    currentCFCombine = oldCF + cfHE * (1 - oldCF);
-                                } else if (oldCF < 0 && cfHE < 0) {
-                                    currentCFCombine = oldCF + cfHE * (1 + oldCF);
-                                } else {
-                                    currentCFCombine = (oldCF + cfHE) / (1 - Math.min(Math.abs(oldCF), Math.abs(cfHE)));
-                                }
+                                currentCFCombine = (oldCF + cfHE) / (1 - Math.min(Math.abs(oldCF), Math.abs(cfHE)));
                             }
-                            steps.push({
-                                iter: iteration,
-                                gejala: rule.g,
-                                cfPakar: rule.cfPakar,
-                                cfUser: cfUser,
-                                cfHE: cfHE,
-                                cfOld: oldCF,
-                                cfCombine: currentCFCombine
-                            });
-                            iteration++;
                         }
+                        
+                        steps.push({
+                            iter: iteration,
+                            gejala: rule.g,
+                            cfPakar: rule.cfPakar,
+                            cfUser: cfUser,
+                            cfHE: cfHE,
+                            cfOld: oldCF,
+                            cfCombine: currentCFCombine
+                        });
+                        iteration++;
                     }
                 });
 
@@ -487,32 +507,32 @@
                         <p>Silakan pilih minimal satu tingkat keyakinan gejala selain <em>"Belum tahu"</em>.</p>
                     </div>
                 `;
-                calcContainer.innerHTML = `<p class="text-slate-400 italic text-center py-6">Tidak ada perhitungan (gejala belum dipilih).</p>`;
+                calcContainer.innerHTML = `<p class="text-slate-400 italic text-center py-4">Tidak ada perhitungan (gejala belum dipilih).</p>`;
                 lucide.createIcons();
                 return;
             }
 
             const mainResult = results[0];
             resContainer.innerHTML = `
-                <div class="space-y-4 text-left">
-                    <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5">
+                <div class="space-y-3 text-left">
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
                         <span class="text-[10px] font-bold text-emerald-800 bg-emerald-200 px-2 py-0.5 rounded">DIAGNOSA UTAMA</span>
-                        <h3 class="text-sm font-bold text-emerald-950">${mainResult.name} (${mainResult.code})</h3>
-                        <div class="flex items-baseline gap-2 pt-1">
-                            <span class="text-3xl font-extrabold text-emerald-700">${mainResult.percentage}%</span>
-                            <span class="text-[11px] text-slate-500">(CF: ${mainResult.finalCF.toFixed(4)})</span>
+                        <h3 class="text-xs font-bold text-emerald-950">${mainResult.name} (${mainResult.code})</h3>
+                        <div class="flex items-baseline gap-2 pt-0.5">
+                            <span class="text-2xl font-extrabold text-emerald-700">${mainResult.percentage}%</span>
+                            <span class="text-[10px] text-slate-500">(CF: ${mainResult.finalCF.toFixed(5)})</span>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
-                        <p class="text-xs font-bold text-slate-800">Rekomendasi Solusi:</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">${mainResult.solution}</p>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg space-y-0.5">
+                        <p class="text-[11px] font-bold text-slate-800">Solusi:</p>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">${mainResult.solution}</p>
                     </div>
-                    <div class="space-y-2 pt-2 border-t border-slate-100">
-                        <p class="text-xs font-bold text-slate-700">Peringkat Diagnosa Lainnya:</p>
+                    <div class="space-y-1.5 pt-1.5 border-t border-slate-100">
+                        <p class="text-[11px] font-bold text-slate-700">Peringkat Lainnya:</p>
                         ${results.slice(1).map(r => `
-                            <div class="flex justify-between items-center text-xs p-2 bg-slate-50 rounded border border-slate-200">
-                                <span class="font-medium text-slate-700">${r.code} - ${r.name}</span>
-                                <span class="font-mono font-bold text-slate-700">${r.percentage}%</span>
+                            <div class="flex justify-between items-center text-[11px] p-1.5 bg-slate-50 rounded border border-slate-200">
+                                <span class="font-medium text-slate-700 truncate pr-2">${r.code} - ${r.name}</span>
+                                <span class="font-mono font-bold text-slate-700 shrink-0">${r.percentage}%</span>
                             </div>
                         `).join('')}
                     </div>
@@ -534,7 +554,7 @@
                                             <span>CF[H,E] = ${s.cfHE.toFixed(4)}</span>
                                         </div>
                                         <p class="text-slate-500">CF Pakar (${s.cfPakar}) × CF User (${s.cfUser}) = ${s.cfHE.toFixed(4)}</p>
-                                        <p class="text-slate-700 font-mono">CF Combine = <strong>${s.cfCombine.toFixed(4)}</strong></p>
+                                        <p class="text-slate-700 font-mono">CF Combine = (${s.cfOld.toFixed(4)} + ${s.cfHE.toFixed(4)}) × (1 - ${s.cfOld.toFixed(4)}) = <strong>${s.cfCombine.toFixed(5)}</strong></p>
                                     </div>
                                 `).join('')}
                             </div>
@@ -575,7 +595,7 @@
                     <td class="p-2.5 border border-slate-900 font-sans text-center">27/02/2026 12:20:00</td>
                     <td class="p-2.5 border border-slate-900 font-sans text-center font-bold">Diag-01</td>
                     <td class="p-2.5 border border-slate-900 font-sans font-bold text-center">${KnowledgeBase.pengamat.nama}</td>
-                    <td class="p-2.5 border border-slate-900 font-sans"><strong>Memiliki Biota Tanah yang sedikit</strong> (76.00%)</td>
+                    <td class="p-2.5 border border-slate-900 font-sans"><strong>Memiliki Biota Tanah yang sedikit</strong> (42.74%)</td>
                     <td class="p-2.5 border border-slate-900 font-sans text-justify leading-relaxed">Gunakan material organik seperti pupuk kompos/kandang untuk menutrisi mikroorganisme tanah dan buat sistem drainase lahan yang baik.</td>
                 </tr>
             `;
